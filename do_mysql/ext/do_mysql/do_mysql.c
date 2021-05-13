@@ -608,14 +608,22 @@ VALUE do_mysql_cReader_next(VALUE self) {
   VALUE reader_container = rb_iv_get(self, "@reader");
 
   if (reader_container == Qnil) {
+    rb_raise(rb_eRuntimeError, "Error reading next row (reader_container nil)");
     return Qfalse;
   }
 
   MYSQL_RES *reader = DATA_PTR(reader_container);
   if(!reader) {
+    rb_raise(rb_eRuntimeError, "Error reading next row (reader null)");
     return Qfalse;
   }
   MYSQL_ROW result = mysql_fetch_row(reader);
+
+  const char *error = mysql_error(reader);
+  if (error[0]) {
+    rb_raise(rb_eRuntimeError, "Error reading next row (error from mysql_fetch_row)");
+    return Qfalse;
+  }
 
   // The Meat
   VALUE field_types = rb_iv_get(self, "@field_types");
