@@ -620,7 +620,7 @@ VALUE do_mysql_cReader_next(VALUE self) {
   MYSQL_ROW result = mysql_fetch_row(reader);
 
   const char *error = mysql_error(reader);
-  if (error[0]) {
+  if (error && error[0]) {
     rb_raise(rb_eRuntimeError, "Error reading next row (error from mysql_fetch_row)");
     return Qfalse;
   }
